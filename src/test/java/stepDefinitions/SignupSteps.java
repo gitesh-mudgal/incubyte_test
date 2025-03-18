@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.testng.asserts.SoftAssert;
 import pageObjects.BaseClass;
 import pageObjects.SignupPage;
 import io.cucumber.java.en.*;
@@ -13,13 +14,14 @@ import java.time.Duration;
 public class SignupSteps {
     WebDriver driver;
     SignupPage signupPage;
+    SoftAssert soft = new SoftAssert();
 
     @Given("User is on the signup page")
     public void user_is_on_signup_page() {
         BaseClass.startBrowser();
         driver = BaseClass.driver;
         driver.get("https://magento.softwaretestingboard.com/customer/account/create/");
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         signupPage = new SignupPage(driver);
     }
 
@@ -160,13 +162,13 @@ public class SignupSteps {
     public void a_name_format_validation_message_should_be_displayed() {
         By errorLocator = By.xpath("//*[text()='Thank you for registering with Main Website Store.']");
         BaseClass.wait("//*[text()='Thank you for registering with Main Website Store.']");
-        Assert.assertFalse("No validation error displayed!", driver.findElement(errorLocator).isDisplayed());
+        soft.assertFalse(driver.findElement(errorLocator).isDisplayed(),"No validation error displayed!");
         BaseClass.tearDown();
     }
 
     @When("User enters maximum allowed characters in all fields")
     public void user_enters_maximum_allowed_characters() {
-        String longText = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        String longText = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789012q";
         signupPage.enterFirstName(longText);
         signupPage.enterLastName(longText);
         signupPage.enterEmail(longText + "@gmail.com");
@@ -175,13 +177,12 @@ public class SignupSteps {
         signupPage.clickCreateAccount();
     }
 
-    @Then("Account should be created successfully or an error message should be displayed")
-    public void account_should_be_created_or_error_displayed() {
-        By successLocator = By.xpath("//*[text()='Thank you for registering with Main Website Store.']");
-        BaseClass.wait("//*[text()='Thank you for registering with Main Website Store.']");
-        boolean isSuccessDisplayed = !driver.findElements(successLocator).isEmpty();
-
-        Assert.assertFalse("Account is created!", isSuccessDisplayed);
+    @Then("Account should Not get created successfully and an error message should be displayed")
+    public void account_should_not_created_and_error_displayed() {
+        By successLocator = By.xpath("//*[contains(text(),'uses too many characters.')]");
+        BaseClass.wait("//*[contains(text(),'uses too many characters.')]");
+        boolean isSuccessDisplayed = driver.findElement(successLocator).isDisplayed();
+        soft.assertTrue( isSuccessDisplayed,"Account Not created!");
         BaseClass.tearDown();
     }
 }

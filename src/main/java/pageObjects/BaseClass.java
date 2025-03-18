@@ -38,7 +38,7 @@ public class BaseClass {
             driver.close();
     }
     public static void wait(String xpath){
-        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(25));
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(30));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
     }
 }

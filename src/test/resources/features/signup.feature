@@ -37,5 +37,5 @@ Feature: Magento Sign Up Functionality
 
   Scenario: Verify sign-up with maximum character limit for fields
     When User enters maximum allowed characters in all fields
-    Then Account should be created successfully or an error message should be displayed
+    Then Account should Not get created successfully and an error message should be displayed
 
